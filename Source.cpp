@@ -15,7 +15,7 @@ void Main_Menu(string);
 void CinemaManagement(int);
 void AdministratorMenu(int);
 //Cinema_Hall function
-void CinemaHall(int);
+void CinemaHallManagement(int);
 void ReadCinemaHallRecord(int&);
 void CinemaSeatPrinting(int);
 void HallSeatPrinting(int, int, int);
@@ -35,7 +35,8 @@ void ModifyMovie(int&);
 void DeleteMovie(int&);
 void MoviePrinting(int&,int);
 bool MovieStartDetection(string);
-void MovieRecordIntoStruct(string, string, string, string, int, int,int&);
+void MovieEndDetection(string,int,double,int&,int&);
+void MovieRecordIntoStruct(string, string, string, string, double, int,int&);
 //employee function
 void EmployeeManagement(int);
 void ReadEmployeeRecord(int&);
@@ -76,7 +77,12 @@ struct movie
 	CinemaHallSeatType backup;
 	
 }movie[100];
-
+struct employee {
+	string name;
+	string id;
+	string password;
+	
+};
 //Main Menu
 int main()
 {
@@ -221,7 +227,7 @@ void CinemaManagement(int option)
 		
 		case(2)://Cinema Hall Modification
 		{
-			CinemaHall(selection);
+			CinemaHallManagement(selection);
 			break;
 		}
 		case(3)://exit
@@ -238,7 +244,7 @@ void CinemaManagement(int option)
 	} while (decision);
 }
 //Cinema Hall Page
-void CinemaHall(int option)
+void CinemaHallManagement(int option)
 {
 	int selection;
 	bool decision = true;
@@ -710,7 +716,6 @@ void MovieManagement(int option)
 		}
 	} while (decision);
 }
-
 void ReadMovieRecord(int& record)
 {
 	ifstream infile;
@@ -748,13 +753,8 @@ void LoadMovieRecord(int& record)
 	outfile.open("movie.txt");
 	for (int i = 0; i < record; i++)
 	{
-		outfile << movie[i].movie_id << endl
-			<< movie[i].movie_name << endl
-			<< movie[i].description << endl
-			<< movie[i].movie_time << endl
-			<< movie[i].movie_length << endl
-			<< movie[i].movie_hall << endl
-			<<movie[i].seats.data;
+		outfile << movie[i].movie_id << endl << movie[i].movie_name << endl << movie[i].description << endl;
+		outfile<< movie[i].movie_time << endl<< movie[i].movie_length << endl<< movie[i].movie_hall << endl<<movie[i].seats.data;
 		for (int j = 0; j < movie[i].seats.data; j++)
 			outfile << movie[i].seats.purchased_row[j];
 		for (int j = 0; j < movie[i].seats.data; j++)
@@ -791,15 +791,14 @@ void AddMovie(int& record)
 		} while (checking);
 		
 		cout << "\t\t\tInput the movie name >>> "; //same name allowed(same name,diff. movie
-		cin >> movie_name;
+		getline(cin, movie_name);
 		movie_name = upper(movie_name);
 		
 		cout << "\t\t\tInput the movie description >>> ";
-		cin >> description;
-		checking = true;
+		getline(cin, description);
 
+		checking = true;
 		do {
-			int hours, remain;
 			cout << "\t\t\tInput the movie_time (24 Hours format XXXX) >>> ";
 			cin >> movie_time;								
 			bool result = MovieStartDetection(movie_time);
@@ -807,11 +806,9 @@ void AddMovie(int& record)
 				checking = false;
 			else
 				cout << "\t\t\tinvalid input" << endl;
-			
 		} while (checking);
 
 		checking = true;
-
 		do {
 			cout << "\t\t\tInput the movie_length in (Hours.minutes~~~ X.XX)>>> ";
 			cin >> movie_length;
@@ -821,63 +818,42 @@ void AddMovie(int& record)
 				cout << "invalid input" << endl;
 		} while (checking);
 
-		int movie_end = stoi(movie_time) + (int(movie_length)*100+(movie_length-int(movie_length))*100);
-		if (movie_end - movie_end / 100 * 100 > 60)
-			movie_end=movie_end - 60 + 100;
+		
 		checking = true;
-
 		do {
-			int hour, minutes,overflow,found;
-			string time;
+
+			int found = 0;
 			cout << "\t\t\tInput the movie_hall >>>";
 			cin >> movie_hall;
-			for (int i = 0; i < record; i++)
-			{
-				if (movie_hall == movie[i].movie_hall)
-				{
-					time = movie[i].movie_time;
-					int timing = stoi(time);
-					hour = int(movie_length);
-					minutes = (movie_length - hour) * 100;
-					int ending = timing + hour * 100 + minutes;		//2490
-					overflow = ending - int(ending / 100 * 100);	//2490-2400
-					if (overflow >= 60)								//90
-						ending = ending - 60 + 100;					//2490-60+100
-
-					if (stoi(movie_time) >= timing && stoi(movie_time) <= ending)
-					{
-						found++;
-					}
-					else if (movie_end >= timing && movie_end <= ending)
-					{
-						cout << "invalid input" << endl;
-						found++;
-					}
-				}
-			}
+			
+			MovieEndDetection(movie_time, movie_hall, movie_length, found, record);
 			if (found == 0)
 				checking = false;
+
 		} while (checking);
+
 		do{
-		cout << "\t\t\tMovie ID: " << movie_id << endl;
-		cout << "\t\t\tMovie ID: " << movie_name << endl;
-		cout << "\t\t\tMovie ID: " << description << endl;
-		cout << "\t\t\tMovie ID: " << movie_time << endl;
-		cout << "\t\t\tMovie ID: " << movie_length << endl;
-		cout << "\t\t\tMovie ID: " << movie_hall << endl;
-		cout << "Are you confirm? <Y>es <N>o >>> " << endl;
-		cin >> confirms;
-		confirms = toupper(confirms);
-		if (confirms == 'Y' || confirms == 'N')
-		{
-			checking = false;
-			decision = false;
-		}
+			cout << "\t\t\tMovie ID: " << movie_id << endl;
+			cout << "\t\t\tMovie ID: " << movie_name << endl;
+			cout << "\t\t\tMovie ID: " << description << endl;
+			cout << "\t\t\tMovie ID: " << movie_time << endl;
+			cout << "\t\t\tMovie ID: " << movie_length << endl;
+			cout << "\t\t\tMovie ID: " << movie_hall << endl;
+			cout << "Are you confirm? <Y>es <N>o >>> " << endl;
+			cin >> confirms;
+			confirms = toupper(confirms);
+			if (confirms == 'Y' || confirms == 'N')
+			{
+				checking = false;
+				decision = false;
+			}
 		}while(checking);
+
 		if (confirms == 'Y')
 		{
 			MovieRecordIntoStruct(movie_id, movie_name, description, movie_time, movie_length, movie_hall, record);
 		}
+
 	} while (decision);
 
 }
@@ -886,7 +862,7 @@ void ModifyMovie(int& record)
 	char confirms;
 	string movie_name, movie_id, description, movie_time;
 	double movie_length;
-	int movie_hall;
+	int movie_hall,trace;
 	bool decision = true;
 	do {
 		int found = 0,selection,storage;
@@ -939,7 +915,7 @@ void ModifyMovie(int& record)
 			{
 				//assume that movie can have the same name !!!
 				cout << "\t\t\tInput new movie name: " << endl;
-				cin >> movie_name;
+				getline(cin, movie_name);
 				movie[storage].movie_name = movie_name;
 				break;
 			}
@@ -947,29 +923,54 @@ void ModifyMovie(int& record)
 			{
 				//assume that description can have the same !!!
 				cout << "\t\t\tInput new movie description: " << endl;
-				cin >> description;
+				getline(cin, description);
 				movie[storage].description = description;
 				break;
 			}
 			case(4):
 			{
+
 				cout << "\t\t\tInput the new start time in 24 Hours format (XXXX)>>> " << endl;
 				cin >> movie_time;
 				bool result = MovieStartDetection(movie_time);
 				if (result)
 				{
-					//check the end time, movie hall
+					MovieEndDetection(movie_time, movie[storage].movie_hall, movie[storage].movie_length, trace, record);
+					if (trace == 0)
+					{
+						movie[storage].movie_time = movie_time;
+					}
 				}
 				break;
 			}
 			case(5)://enter length (start time,movie hall)
 			{
-
+				cout << "Enter the new movie length in Hours.Minutes(X.XX) >>>";
+				cin >> movie_length;
+				MovieEndDetection(movie[storage].movie_time, movie[storage].movie_hall,movie_length, trace, record);
+				if (trace == 0)
+				{
+					movie[storage].movie_length = movie_length;
+				}
 				break;
 			}
 			case(6)://movie hall( start time, end time)
 			{
-
+				cout << "Enter the new movie hall >>>";
+				cin >> movie_hall;
+				MovieEndDetection(movie[storage].movie_time,movie_hall, movie[storage].movie_length, trace, record);
+				if (trace == 0)
+				{
+					movie[storage].movie_hall = movie_hall;
+					movie[storage].seats.data = 0;
+					movie[storage].seats.purchased_row[0] = 0;
+					movie[storage].seats.purchased_column[0] = 0;
+					movie[storage].backup.data = unavailable[storage].data;
+					for (int i = 0; i < movie[storage].backup.data; i++)
+						movie[storage].backup.row[i] = unavailable[storage].row[i];
+					for (int i = 0; i < movie[storage].backup.data; i++)
+						movie[storage].backup.column[i] = unavailable[storage].column[i];
+				}
 				break;
 			}
 			case(7):
@@ -984,13 +985,56 @@ void ModifyMovie(int& record)
 			}
 		
 		}
+		LoadMovieRecord(record);
 	} while (decision);
 }
 void DeleteMovie(int& record) 
 {
+	int found=0;
+	string movie_id;
+	bool decision = true;
+	do {
+		cout << "Input the movie id you want to delete >>>>";
+		cin >> movie_id;
+		for (int i = 0; i < record; i++)
+		{
+			if (movie_id == movie[i].movie_id)
+			{
+				cout << "Movie ID found in system" << endl;
+				found++;
+				for (int j = i; j < record; j++)
+				{
+					movie[j].movie_id = movie[j + 1].movie_id;
+					movie[j].movie_name = movie[j + 1].movie_name;
+					movie[j].description = movie[j + 1].description;
+					movie[j].movie_time = movie[j + 1].movie_time;
+					movie[j].movie_length = movie[j + 1].movie_length;
+					movie[j].movie_hall = movie[j + 1].movie_hall;
+					movie[j].seats.data = movie[j + 1].seats.data;
+					for (int z = 0; z < movie[j].seats.data; z++)
+						movie[j].seats.purchased_row[z] = movie[j+1].seats.purchased_row[z];
+					for (int z = 0; z < movie[j].seats.data; z++)
+						movie[j].seats.purchased_row[z] = movie[j+1].seats.purchased_column[z];
+					movie[j].backup.data = movie[j + 1].backup.data;
+					for (int z = 0; z < movie[j].backup.data; z++)
+						movie[j].backup.row[z] = movie[j+1].backup.row[z];
+					for (int z = 0; z < movie[j].backup.data; z++)
+						movie[j].backup.column[z] = movie[j+1].backup.column[z];
+				}
+				
+			}
+		}
+		if (found > 0)
+		{
+			record--;
+			decision = false;
+			LoadMovieRecord(record);
+		}
+		else
+			cout << "Invalid movie id" << endl;
+	} while (decision);
 
 }
-
 void MoviePrinting(int& record,int w)
 {
 	for (int i = 0; i < record; i++)
@@ -1010,20 +1054,18 @@ bool MovieStartDetection(string movie_time)   //detect start time of movie
 
 	int checking = stoi(movie_time);				//2401      2061
 	int integer_hours = checking / 100 * 100;		//2400		2000
-	int remain = checking - integer_hours;			//1			61
-	double hours = double(checking) / 100;			//24.01		20.61
-	int size = movie_time.size();
+	int remain = checking%integer_hours;			//1			61
+	int size=movie_time.size();
 	if (size > 4 || size < 4)
 		return false;
-	else if (hours > 24)		//if more than 24 hours (a day)
+	else if (integer_hours > 2400)		//if more than 24 hours (a day)
 		return false;
 	else if (remain > 60)		//if minutes more than 60
 		return false;
 	else
 		return true;
 }
-
-void MovieRecordIntoStruct(string id,string name,string description,string time,int length,int hall,int &record)
+void MovieRecordIntoStruct(string id,string name,string description,string time,double length,int hall,int &record)
 {
 	record++;
 	movie[record - 1].movie_id = id;
@@ -1046,7 +1088,36 @@ void MovieRecordIntoStruct(string id,string name,string description,string time,
 	}
 	LoadMovieRecord(record);
 }
+void MovieEndDetection(string movie_time,int movie_hall,double movie_length,int& found,int &record)
+{
+	int movie_end = stoi(movie_time) + (int(movie_length) * 100 + (movie_length - int(movie_length)) * 100);
+	if (movie_end - movie_end / 100 * 100 > 60)
+		movie_end = movie_end - 60 + 100;
 
+	for (int i = 0; i < record; i++)
+	{
+		if (movie_hall == movie[i].movie_hall)
+		{
+			string time = movie[i].movie_time;					//1200
+			int timing = stoi(time);
+			int hour = int(movie_length);						//2.40=2
+			int minutes = (movie_length - hour) * 100;			//40
+			int ending = timing + hour * 100 + minutes;			//1200+2*100+40
+			int overflow = ending - int(ending / 100 * 100);
+			if (overflow >= 60)
+				ending = ending - 60 + 100;
+
+			if (stoi(movie_time) >= timing && stoi(movie_time) <= ending)
+			{
+				found++;
+			}
+			else if (movie_end >= timing && movie_end <= ending)
+			{
+				found++;
+			}
+		}
+	}
+}
 
 
 
