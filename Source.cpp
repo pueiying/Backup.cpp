@@ -9,8 +9,8 @@
 #include <time.h>
 using namespace std;
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-char dateStr[9];
-char timeStr[9];
+SYSTEMTIME systemTime;
+
 
 //function declaration
 string upper(string);
@@ -1532,7 +1532,7 @@ void ModifyEmployee(int& record)
 				cout << "\t\t\t<3> employee department" << endl;
 				cout << "\t\t\t<4> employee position" << endl;
 				cout << "\t\t\t<5> Exit" << endl;
-				cout << "\t\t\tinput your selection to modify >>> " << endl;
+				cout << "\t\t\tinput your selection to modify >>> " ;
 				cin >> selection;
 				switch (selection)
 				{
@@ -1604,7 +1604,7 @@ bool EmployeeID(string employee_id,int &record)
 	}
 	if (found == 0 && size == 5)
 	{
-		if ((employee_id[0] == 'E' && employee_id[1] == 'W') && (isdigit(employee_id[3]) && ((isdigit(employee_id[3]) && isdigit(employee_id[3])) && isdigit(employee_id[4]))))
+		if ((employee_id[0] == 'E' && employee_id[1] == 'W') && (isdigit(employee_id[3]) && (isdigit(employee_id[3]) && isdigit(employee_id[3]))))
 			return true;//&& is binary operator(only can compare two items)
 		else
 			return false;
@@ -1619,10 +1619,8 @@ void MovieDetails(int option)
 	int record = 0;
 	string leave;
 	ReadMovieRecord(record);
-	_strdate_s(dateStr);
-	_strtime_s(timeStr);
 	cout << "\n\n\n\n\t\t\t" << string(130, char(95)) << endl;
-	cout << "\t\t\t" << setw(122) << dateStr << timeStr << endl;
+	cout << "\t\t\t" << setw(114) << systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
 	cout << "\t\t\t" << string(130, char(95)) << endl;
 	MoviePrinting(record, 0);
 	cout << "\t\t\t" << string(130, char(95)) << endl;
@@ -1673,10 +1671,9 @@ void BookMovie(int option)
 		string keyword, movie_name,movie_time;
 		system("cls");
 		ReadMovieRecord(record);
-		_strdate_s(dateStr);
-		_strtime_s(timeStr);
+		GetSystemTime(&systemTime);
 		cout << "\n\n\n\n\t\t\t" << string(130, char(95)) << endl;
-		cout << "\t\t\t" << setw(121) << dateStr << " " << timeStr << endl;
+		cout << "\t\t\t" << setw(114) <<systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
 		cout << "\t\t\t" << string(130, char(95)) << endl;
 		MoviePrinting(record, 0);
 		cout << "\t\t\t" << string(130, char(95)) << endl;
@@ -1694,7 +1691,7 @@ void BookMovie(int option)
 			else
 				cout << "\t\t\tInvalid input. Please input again." << endl;
 		} while (validated);
-		cout << "\t\t\tInput the keyword to search the movie >>>";
+		cout << "\t\t\tInput the keyword to search the movie <E>xit >>>";
 		cin >> keyword;
 		keyword = upper(keyword);
 		for (int i = 0; i < record; i++)
@@ -1706,7 +1703,8 @@ void BookMovie(int option)
 				{
 					system("cls");
 					cout << "\n\n\n\n\t\t\t" << string(130, char(95)) << endl;
-					cout << "\t\t\t" << setw(122) << dateStr << " " << timeStr << endl;
+					cout << "\t\t\t" << setw(115) <<systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
+
 					cout << "\t\t\t" << string(130, char(95)) << endl;
 					MoviePrinting(record, 0);
 					cout << "\t\t\t" << string(130, char(95)) << endl;
@@ -1720,29 +1718,88 @@ void BookMovie(int option)
 				cout << "\t\t\tMovie Hall: " << movie[i].movie_hall << endl;
 			}
 		}
-		if (result == 0)
-			cout << "no result found" << endl;
+		if (keyword == "E")
+			decision = false;
+		else if (result == 0)
+		{
+			cout << "\t\t\tno result found" << endl;
+			return BookMovie(0);
+		}
 		else {
-			cout << "Input the time slot you want to book the movie <E>xit >>>";
-			cin >> movie_time;
-			if (movie_time == "E" || movie_time == "e")
+			bool confirms = true;
+			int found = 0,adult,child;
+			char booking;
+			while (confirms)
 			{
-				decision = false;
-			}
-			else
-			{
-				int index=0;
-				bool result = MovieStartDetection(movie_time);
-				if (result)
+				cout << "\t\t\tInput the time slot you want to book the movie <E>xit >>>";
+				cin >> movie_time;
+				if (movie_time == "E" || movie_time == "e")
 				{
+					decision = false;
+				}
+				else
+				{
+					int index = 0;
+					bool result = MovieStartDetection(movie_time);
+
 					for (int i = 0; i < record; i++)
 					{
 						if (movie_name == movie[i].movie_name && movie_time == movie[i].movie_time)
+						{
 							index = i;
+							found++;
+						}
 					}
-					CinemaSeatPrinting(index,0);
+					if (result&&found>0)
+					{
+						cout << "\t\t\tMovie Name: " << movie[index].movie_name << endl;
+						cout << "\t\t\tMovie Description: " << movie[index].description << endl;
+						cout << "\t\t\tMovie Time: " << movie[index].movie_time << endl;
+						cout << "\t\t\tMovie Length H.MM: " << fixed << setprecision(2) << movie[index].movie_length << endl;
+						cout << "\t\t\tMovie Hall: " << movie[index].movie_hall << endl;
+						cout << "\t\t\tAre this movie you want to book <Y>es <N>o >> >";
+						cin >> booking;
+						booking = toupper(booking);
+						if (booking == 'Y')
+						{
+							bool payment = true;
+							char final = 'W';
+							do {
+								int row[50], int column[50];
+								CinemaSeatPrinting(index, 0);
+								cout << "\t\t\tInput the number of childrem you want to book for >>>";
+								cin >> child;
+								cout << "\t\t\tInput the number of adult you want to book for >>>";
+								cin >> adult;
+								for (int i = 0; i < child + adult; i++)
+								{
+									cout << "\t\t\tNo. " << i + 1 << endl;
+									cout << "\t\t\tInput the row you want >>>>";
+									cin >> row[i];
+									cout << "\t\t\tInput the colomn you want >>>>";
+									cin >> column[i];
+								}
+								cout << "Successfully booked the seats with ";
+								for (int i = 0; i < child + adult; i++)
+								{
+									cout << "Row " << row[i] <<"Column "<< column[i]<<endl;
+								}
+								while (final != 'Y' || final != 'N' || final != 'E')
+								{
+									cout << "Are you confirms with this booking <Y>es <N>o <E>xit >>>";
+									cin >> final;
+									final = toupper(final);
+									if (final == 'Y' || final == 'E')
+										payment = false, confirms = false;
+									else if (!(final == 'N'))
+										cout << "Invalid input" << endl;
+								}
+							} while (payment);
+						}
+					}
 				}
 			}
+			//proceed to payment
 		}
 	} while (decision);
 }
@@ -1859,3 +1916,8 @@ void Main_Menu(string Name)
 	cout << "\t\t\t=" << string(50, ' ') << string(14, char(126)) << string(54, ' ') << " = \n";
 	cout << "\t\t\t" << string(121, char(61)) << "\n";
 }
+
+
+
+
+
