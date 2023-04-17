@@ -1618,6 +1618,7 @@ void MovieDetails(int option)
 	system("cls");
 	int record = 0;
 	string leave;
+	GetSystemTime(&systemTime);
 	ReadMovieRecord(record);
 	cout << "\n\n\n\n\t\t\t" << string(130, char(95)) << endl;
 	cout << "\t\t\t" << setw(114) << systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
