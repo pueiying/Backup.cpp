@@ -1877,8 +1877,8 @@ void BookSeatPrinting(int w, int i, int j)
 
 void Main_Menu(string Name)
 {
-	int i=142, j=48;
-	system("Color 30");
+	int i=112, j=112;
+	system("Color 70");
 	cout << "\n\n\n\t\t\t" << string(121, char(61)) << "\n";
 	cout << "\t\t\t=" << right << setw(121) << "=\n";
 	cout << "\t\t\t=" << string(4, ' ') << string(20, char(126)) << string(20, ' ') << string(25, char(126)) << string(25, ' ') << string(19, char(126)) << string(5, ' ') << " = \n";
