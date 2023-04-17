@@ -413,7 +413,7 @@ void CinemaSeatPrinting(int w,int f)
 {
 	for (int i = 0; i < 10; i++)
 	{
-		cout << "\t\t\t";
+		cout << "\t\t\t\t\t";
 		cout << i;
 		if (i == 0)
 		{
@@ -1620,20 +1620,21 @@ void MovieDetails(int option)
 	string leave;
 	GetSystemTime(&systemTime);
 	ReadMovieRecord(record);
-	cout << "\n\n\n\n\t\t\t" << string(130, char(95)) << endl;
-	cout << "\t\t\t" << setw(114) << systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
-	cout << "\t\t\t" << string(130, char(95)) << endl;
+	cout << "\n\n\n\n\t\t\t" << string(150, char(95)) << endl;
+	cout << "\t\t\t" << setw(134) << systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
+	cout << "\t\t\t" << string(150, char(95)) << endl;
 	MoviePrinting(record, 0);
-	cout << "\t\t\t" << string(130, char(95)) << endl;
+	cout << "\t\t\t" << string(150, char(95)) << endl;
+	cin.ignore();
 	cout << "\t\t\tPress any button to continue >>>";
 	getline(cin, leave);
-	cin.ignore();
 }
 void PurchaseNow(int option)
 {
 	int selection;
 	bool decision=true;
 	do {
+		system("cls");
 		cout << "\t\t\t<1> Book a movie UwU " << endl;
 		cout << "\t\t\t<2> Food & Beverages " << endl;
 		cout << "\t\t\t<3> Exit " << endl;
@@ -1668,16 +1669,16 @@ void BookMovie(int option)
 {
 	bool decision=true,validated=true;
 	do {
-		int record = 0, result=0,time_validate=0;
+		int record = 0, result=0,time_validate=0,inner=0;
 		string keyword, movie_name,movie_time;
 		system("cls");
 		ReadMovieRecord(record);
 		GetSystemTime(&systemTime);
-		cout << "\n\n\n\n\t\t\t" << string(130, char(95)) << endl;
-		cout << "\t\t\t" << setw(114) <<systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
-		cout << "\t\t\t" << string(130, char(95)) << endl;
+		cout << "\n\n\n\n\t\t\t" << string(150, char(95)) << endl;
+		cout << "\t\t\t" << setw(134) <<systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
+		cout << "\t\t\t" << string(150, char(95)) << endl;
 		MoviePrinting(record, 0);
-		cout << "\t\t\t" << string(130, char(95)) << endl;
+		cout << "\t\t\t" << string(150, char(95)) << endl;
 		int date=0, month=0, year=0,dd,mm,yyyy;
 		do {
 			cout << "\t\t\tDear customer, please input current date (refer to upper right)" << endl;
@@ -1699,19 +1700,17 @@ void BookMovie(int option)
 		{
 			if (movie[i].movie_name.find(keyword) != string::npos)//keyword checking process
 			{
-				result++;
-				if (result == 1)
+				inner++;
+				if (inner== 1)
 				{
 					system("cls");
-					cout << "\n\n\n\n\t\t\t" << string(130, char(95)) << endl;
-					cout << "\t\t\t" << setw(115) <<systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
+					cout << "\n\n\n\n\t\t\t" << string(150, char(95)) << endl;
+					cout << "\t\t\t" << setw(135) <<systemTime.wDay << "/" <<systemTime.wMonth << "/" << systemTime.wYear << " " << systemTime.wHour << ":" << systemTime.wMinute << ":" << systemTime.wSecond << endl;
 
-					cout << "\t\t\t" << string(130, char(95)) << endl;
-					MoviePrinting(record, 0);
-					cout << "\t\t\t" << string(130, char(95)) << endl;
+					cout << "\t\t\t" << string(150, char(95)) << endl;
 				}
 				movie_name = movie[i].movie_name;
-				cout << "\n\t\t\tNo. " << result << endl;
+				cout << "\n\t\t\tNo. " << inner << endl;
 				cout << "\t\t\tMovie Name: " << movie[i].movie_name << endl;
 				cout << "\t\t\tMovie Description: " << movie[i].description << endl;
 				cout << "\t\t\tMovie Time: " << movie[i].movie_time << endl;
@@ -1727,15 +1726,17 @@ void BookMovie(int option)
 			return BookMovie(0);
 		}
 		else {
+			cout << "\t\t\t" << string(150, char(95)) << endl;
 			bool confirms = true;
 			int found = 0,adult,child;
 			char booking;
 			while (confirms)
 			{
-				cout << "\t\t\tInput the time slot you want to book the movie <E>xit >>>";
+				cout << "\t\t\tInput the showtime of the movie <E>xit >>>";
 				cin >> movie_time;
 				if (movie_time == "E" || movie_time == "e")
 				{
+					confirms = false;
 					decision = false;
 				}
 				else
@@ -1769,7 +1770,7 @@ void BookMovie(int option)
 								int row[50];
 								int column[50];
 								CinemaSeatPrinting(index, 0);
-								cout << "\t\t\tInput the number of childrem you want to book for >>>";
+								cout << "\t\t\tInput the number of children you want to book for >>>";
 								cin >> child;
 								cout << "\t\t\tInput the number of adult you want to book for >>>";
 								cin >> adult;
@@ -1786,7 +1787,7 @@ void BookMovie(int option)
 								{
 									cout << "Row " << row[i] <<"Column "<< column[i]<<endl;
 								}
-								while (final != 'Y' || final != 'N' || final != 'E')
+								while (final != 'Y' || (final != 'N' || final != 'E'))
 								{
 									cout << "Are you confirms with this booking <Y>es <N>o <E>xit >>>";
 									cin >> final;
@@ -1858,7 +1859,7 @@ void BookSeatPrinting(int w, int i, int j)
 	int checking = 1;
 	if (movie[w].backup.data != 0)
 	{
-		for (int z = 0; z < unavailable[w].data; z++)
+		for (int z = 0; z < movie[w].backup.data; z++)
 		{
 			if (i == movie[w].seats.purchased_row[z] && j == movie[w].seats.purchased_column[z])
 			{
@@ -1868,6 +1869,7 @@ void BookSeatPrinting(int w, int i, int j)
 			else if (i == movie[w].backup.row[z] && j == movie[w].backup.column[z])
 			{
 				cout << setw(2) << " ";
+				checking = 0;
 			}
 		}
 	}
