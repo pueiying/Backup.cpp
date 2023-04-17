@@ -1766,7 +1766,8 @@ void BookMovie(int option)
 							bool payment = true;
 							char final = 'W';
 							do {
-								int row[50], int column[50];
+								int row[50];
+								int column[50];
 								CinemaSeatPrinting(index, 0);
 								cout << "\t\t\tInput the number of childrem you want to book for >>>";
 								cin >> child;
