@@ -56,6 +56,8 @@ void BookMovie(int);
 void TimeChecking(int, int, int, int, int, int, int&);
 void DateRecord(int, int, int, int, int, int, int&);
 void BookSeatPrinting(int, int, int);
+//refresh the cinema hall
+void CinemaRefresh(int);
 //structure declaration
 struct mapping_seats
 {//cinema hall	//a set of column and row = 1 data
@@ -88,12 +90,14 @@ string department[5] = { "INFORMATION TECHNOLOGY","HUMAN RESOURCES","FINANCE","M
 int main()
 {
 	bool decision = true;
+	string input;
 	int selection;
 	do{
 		system("cls");
 		Main_Menu("MAIN");
 		cout << "\t\t\tPlease input your selection >>> ";
-		cin >> selection;
+		getline(cin, input);
+		selection=stoi (input);
 		switch (selection)
 		{
 		case(1)://Movie details
@@ -201,7 +205,7 @@ void AdministratorMenu(int option)
 		{
 		case(1):
 		{
-			
+			CinemaRefresh(selection);
 			break;
 		}
 		case(2)://Cinema management
@@ -219,7 +223,7 @@ void AdministratorMenu(int option)
 		}
 		case(5)://Employee management
 		{
-			EmployeeManagement(5);
+			EmployeeManagement(selection);
 			break;
 		}
 		case(6):
@@ -372,6 +376,7 @@ void ReadCinemaHallRecord(int& record)
 			record++;
 		}
 	}
+	infile.close();
 }
 void LoadCinemaHallRecord(int& record)
 {
@@ -800,6 +805,7 @@ void ReadMovieRecord(int& record)
 			record++;
 		}
 	}
+	infile.close();
 
 }
 void LoadMovieRecord(int& record)
@@ -857,6 +863,7 @@ void LoadMovieRecord(int& record)
 		if (!(i == record - 1))
 			outfile << endl;
 	}
+	outfile.close();
 }
 void AddMovie(int& record)
 {
@@ -1341,6 +1348,7 @@ void ReadEmployeeRecord(int& record)
 			record++;
 		}
 	}
+	details.close();
 }
 void LoadEmployeeRecord(int& record)
 {
@@ -1361,8 +1369,8 @@ void LoadEmployeeRecord(int& record)
 			else
 				details << employee[i].password << endl;
 		}
-
 	}
+	details.close();
 }
 void AddEmployee(int& record)
 {
@@ -1625,9 +1633,8 @@ void MovieDetails(int option)
 	cout << "\t\t\t" << string(150, char(95)) << endl;
 	MoviePrinting(record, 0);
 	cout << "\t\t\t" << string(150, char(95)) << endl;
-	cin.ignore();
-	cout << "\t\t\tPress any button to continue >>>";
-	getline(cin, leave);
+	cout << "\t\t\t";
+	system("pause");
 }
 void PurchaseNow(int option)
 {
@@ -1793,8 +1800,11 @@ void BookMovie(int option)
 									cin >> final;
 									final = toupper(final);
 									if (final == 'Y' || final == 'E')
-										payment = false, confirms = false;
-									else if (!(final == 'N'))
+									{
+										payment = false;
+										confirms = false;
+									}
+									else if (final != 'N')
 										cout << "Invalid input" << endl;
 								}
 							} while (payment);
@@ -1875,6 +1885,63 @@ void BookSeatPrinting(int w, int i, int j)
 	}
 	if (checking)
 		cout << setw(2) << "A";
+}
+void CinemaRefresh(int option)
+{
+	string confirms;
+	bool decision=true;
+	int movie_record=0, hall_record=0;
+	while (decision)
+	{
+		cout << "\n\n\n\t\t\tCinema Refreshing terms and conditions!!!" << endl;
+		cout << "\t\t\tOnce you confirm to refresh the cinema, the available seats and the cinema hall record of each movie will be refreshed " << endl;
+		cout << "\t\t\t to the latest updated from the cinema hall record" << endl;
+		cout << "\t\t\tThe system is not reversable after confirmation have made" << endl;
+		cout << "\t\t\tCinema Refreshing Confirmation" << endl;
+		cout << "\t\t\t if Confirms <Y>es, else <N>o  >>>";
+		cin.ignore();
+		getline(cin, confirms);
+		confirms = upper(confirms);
+		cout << confirms << endl;
+		if (confirms == "Y")
+		{
+			ReadMovieRecord(movie_record);
+			ReadCinemaHallRecord(hall_record);
+			for (int i = 0; i < movie_record; i++)
+			{
+				movie[i].seats.data = 0;
+				movie[i].seats.purchased_row[0] = 0;
+				movie[i].seats.purchased_column[0] = 0;
+				if (movie[i].movie_hall <= hall_record || movie[i].movie_hall > 0)
+				{
+					movie[i].backup.data = unavailable[movie[i].movie_hall - 1].data;
+					if (movie[i].backup.data > 0)
+					{
+						for (int j = 0; j < movie[i].backup.data; j++)
+						{
+							movie[i].backup.row[j] = unavailable[movie[i].movie_hall - 1].row[j];
+						}
+						for (int j = 0; j < movie[i].backup.data; j++)
+						{
+							movie[i].backup.column[j] = unavailable[movie[i].movie_hall - 1].column[j];
+						}
+					}
+					else
+					{
+						movie[i].backup.row[0] = 0;
+						movie[i].backup.column[0] = 0;
+					}
+				}
+			}
+			LoadMovieRecord(movie_record);
+			decision = false;
+
+		}
+		else if (confirms == "N")
+			decision = false;
+		else
+			cout << "\t\t\tInvalid Input found" << endl;
+	}
 }
 
 void Main_Menu(string Name)
