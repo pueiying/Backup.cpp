@@ -1890,6 +1890,7 @@ void CinemaRefresh(int option)
 {
 	string confirms;
 	bool decision=true;
+	cin.ignore();
 	int movie_record=0, hall_record=0;
 	while (decision)
 	{
@@ -1899,10 +1900,8 @@ void CinemaRefresh(int option)
 		cout << "\t\t\tThe system is not reversable after confirmation have made" << endl;
 		cout << "\t\t\tCinema Refreshing Confirmation" << endl;
 		cout << "\t\t\t if Confirms <Y>es, else <N>o  >>>";
-		cin.ignore();
 		getline(cin, confirms);
 		confirms = upper(confirms);
-		cout << confirms << endl;
 		if (confirms == "Y")
 		{
 			ReadMovieRecord(movie_record);
